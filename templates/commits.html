@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mesures des Commits</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+    <div id="chart_div" style="width: 100%; height: 500px;"></div>
+
+    <script>
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(fetchCommitsData);
+
+      function fetchCommitsData() {
+        // Appel à l'API GitHub (Indice 1)
+        fetch('https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits')
+          .then(response => response.json())
+          .then(commits => {
+            processCommits(commits);
+          });
+      }
+
+      function processCommits(commits) {
+        // Objet pour stocker le comptage : { "57": 2, "58": 5 }
+        const minutesCount = {};
+
+        commits.forEach(item => {
+          // Extraction de la date (Indice 2)
+          const fullDate = item.commit.author.date; // Ex: "2024-02-11T11:57:27Z"
+          
+          // Extraction des minutes (Indice 3)
+          // On transforme la chaîne en objet Date pour isoler les minutes facilement
+          const dateObj = new Date(fullDate);
+          const minute = dateObj.getMinutes().toString();
+
+          // Incrémentation du compteur pour cette minute
+          minutesCount[minute] = (minutesCount[minute] || 0) + 1;
+        });
+
+        drawChart(minutesCount);
+      }
+
+      function drawChart(minutesCount) {
+        const dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('string', 'Minute');
+        dataTable.addColumn('number', 'Nombre de Commits');
+
+        // Conversion de l'objet de comptage en tableau pour Google Charts
+        // On trie les minutes numériquement
+        const sortedMinutes = Object.keys(minutesCount).sort((a, b) => a - b);
+        
+        sortedMinutes.forEach(min => {
+          dataTable.addRow([min + " min", minutesCount[min]]);
+        });
+
+        const options = {
+          title: 'Nombre de commits effectués par minute',
+          hAxis: { title: 'Minute de l\'heure' },
+          vAxis: { title: 'Quantité de commits', minValue: 0 },
+          legend: { position: 'none' },
+          colors: ['#e67e22'], // Couleur orange pour rappeler GitHub
+          bar: { groupWidth: '80%' }
+        };
+
+        const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(dataTable, options);
+      }
+    </script>
+</body>
+</html>
