@@ -1,1 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Metrique - Histogramme</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 100%; height: 500px;"></div>
 
+    <script>
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(drawChartFromAPI);
+
+      function drawChartFromAPI() {
+        // Récupération de données depuis votre API /tawarano/
+        fetch('/tawarano/')
+          .then(response => response.json())
+          .then(data => {
+            renderChart(data);
+          });
+      }
+
+      function renderChart(data) {
+        var dataTable = new google.visualization.DataTable();
+        dataTable.addColumn('string', 'Date');
+        dataTable.addColumn('number', 'Température (°C)');
+
+        // Remplissage du tableau avec les données de l'API
+        data.results.forEach(entry => {
+          var date = new Date(entry.Jour * 1000);
+          dataTable.addRow([date.toLocaleDateString(), entry.temp]);
+        });
+
+        // Configuration pour un histogramme (ColumnChart)
+        var options = {
+          title: 'Évolution des températures de la ville de Tawarano',
+          legend: { position: 'bottom' },
+          hAxis: { title: 'Date' },
+          vAxis: { title: 'Degrés Celsius' },
+          bar: { groupWidth: '75%' }, // Ajuste la largeur des barres
+          colors: ['#3b82f6'] // Une couleur moderne bleue
+        };
+
+        // Utilisation de ColumnChart pour l'histogramme
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(dataTable, options);
+      }
+    </script>
+  </body>
+</html>
