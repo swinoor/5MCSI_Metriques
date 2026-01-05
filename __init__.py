@@ -11,8 +11,8 @@ def mongraphique():
     return render_template("graphique.html")
 
 @app.route("/contact/")
-def MaPremiereAPI():
-    return "<h2>Ma page de contact</h2>"
+def mongraphique():
+    return render_template("contact.html")
 
 @app.route('/tawarano/')
 def meteo():
