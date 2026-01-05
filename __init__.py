@@ -6,6 +6,10 @@ from urllib.request import urlopen
 import sqlite3
                                                                                                                                       
 app = Flask(__name__)   
+@app.route("/commits/")
+def mongraphique4():
+    return render_template("commits.html")
+
 @app.route("/histogramme/")
 def mongraphique3():
     return render_template("histogramme.html")
