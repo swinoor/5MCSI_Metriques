@@ -11,7 +11,7 @@ def mongraphique():
     return render_template("graphique.html")
 
 @app.route("/contact/")
-def mongraphique():
+def mongraphique2():
     return render_template("contact.html")
 
 @app.route('/tawarano/')
